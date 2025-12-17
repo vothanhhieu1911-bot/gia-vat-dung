@@ -11,16 +11,17 @@ const products = [
     },
     {
       name: "cong ngu",
-      price: 180000,
+      price: 0,
       image: "images/congngu.jpg"
     },
     {
       name: "nghia dia",
-      price: 180000,
+      price: 0,
       image: "images/nghia.jpg"
     }
   ];
 
   
+
 
 
