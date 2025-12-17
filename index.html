@@ -1,10 +1,73 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Test Web</title>
+  <title>Tra cứu giá vật dụng</title>
+
+  <script src="data.js"></script>
+
+  <style>
+    body {
+      font-family: Arial;
+      padding: 20px;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+    }
+    .card {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-top: 15px;
+    }
+    img {
+      width: 100%;
+      max-width: 200px;
+      display: block;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
-  <h1>Web đã chạy!</h1>
+
+<h2>🔍 Tra cứu giá vật dụng</h2>
+
+<input
+  type="text"
+  placeholder="Nhập tên sản phẩm..."
+  onkeyup="searchProduct(this.value)"
+>
+
+<div id="result"></div>
+
+<script>
+function searchProduct(keyword) {
+  const result = document.getElementById("result");
+  result.innerHTML = "";
+
+  if (!keyword) return;
+
+  const matches = products.filter(p =>
+    p.name.toLowerCase().includes(keyword.toLowerCase())
+  );
+
+  if (matches.length === 0) {
+    result.innerHTML = "❌ Không tìm thấy sản phẩm";
+    return;
+  }
+
+  matches.forEach(p => {
+    result.innerHTML += `
+      <div class="card">
+        <b>${p.name}</b><br>
+        Giá: ${p.price.toLocaleString()} đ
+        <img src="${p.image}">
+      </div>
+    `;
+  });
+}
+</script>
+
 </body>
 </html>
