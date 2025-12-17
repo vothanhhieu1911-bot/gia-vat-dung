@@ -68,9 +68,15 @@ const products = [
       name: "nghia5",
       price: 1000000,
       image: "images/nghia.jpg"
+    },
+    {
+      name: "tu",
+      price: 0,
+      image: "images/tubede.jpg"
     }
   ];
   
+
 
 
 
