@@ -1,37 +1,54 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
-  <title>Tra cứu giá vật dụng</title>
+  <title>Tra cứu giá sản phẩm</title>
 
+  <!-- Load dữ liệu -->
   <script src="data.js"></script>
 
   <style>
-    body {
-      font-family: Arial;
-      padding: 20px;
-    }
-    input {
-      width: 100%;
-      padding: 10px;
-      font-size: 16px;
-    }
-    .card {
-      border: 1px solid #ccc;
-      padding: 10px;
-      margin-top: 15px;
-    }
-    img {
-      width: 100%;
-      max-width: 200px;
-      display: block;
-      margin-top: 10px;
-    }
-  </style>
+  body {
+    font-family: Arial;
+    padding: 30px;
+  }
+  input {
+    width: 300px;
+    padding: 8px;
+    font-size: 16px;
+  }
+
+  /* Container chứa các card */
+  #result {
+    display: grid; /* bật layout grid */
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* mỗi cột tối thiểu 250px */
+    gap: 20px; /* khoảng cách giữa các card */
+  }
+
+  /* Card sản phẩm */
+  .card {
+    border: 1px solid #ccc;
+    padding: 15px;
+    background: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    text-align: center;
+  }
+
+  /* Ảnh trong card */
+  .card img {
+    width: 100%;
+    height: 150px;
+    object-fit: contain; /* giữ tỉ lệ ảnh */
+    margin-top: 10px;
+  }
+</style>
+
 </head>
 <body>
 
-<h2>🔍 Tra cứu giá vật dụng</h2>
+<h2>🔍 Tra cứu giá sản phẩm</h2>
 
 <input
   type="text"
@@ -42,32 +59,49 @@
 <div id="result"></div>
 
 <script>
-function searchProduct(keyword) {
-  const result = document.getElementById("result");
-  result.innerHTML = "";
-
-  if (!keyword) return;
-
-  const matches = products.filter(p =>
-    p.name.toLowerCase().includes(keyword.toLowerCase())
-  );
-
-  if (matches.length === 0) {
-    result.innerHTML = "❌ Không tìm thấy sản phẩm";
-    return;
+  // Hàm viết hoa chữ cái đầu
+  function capitalizeWords(str) {
+    return str.replace(/\b\w/g, c => c.toUpperCase());
   }
 
-  matches.forEach(p => {
-    result.innerHTML += `
-      <div class="card">
-        <b>${p.name}</b><br>
-        Giá: ${p.price.toLocaleString()} đ
-        <img src="${p.image}">
-      </div>
-    `;
-  });
-}
+  // Hàm hiển thị sản phẩm
+  function displayProducts(productsToShow) {
+    const result = document.getElementById("result");
+
+    if (productsToShow.length > 0) {
+      result.innerHTML = productsToShow.map(p => `
+        <div class="card">
+          <b>${capitalizeWords(p.name)}</b>
+          <div class="price">${p.price > 0 ? p.price.toLocaleString() + ' đ' : 'Liên hệ để biết giá'}</div>
+          <img src="${p.image}" alt="${p.name}">
+        </div>
+      `).join("");
+    } else {
+      result.innerHTML = "❌ Không tìm thấy sản phẩm";
+    }
+  }
+
+  // Hàm search khi người dùng gõ
+  function searchProduct(keyword) {
+    if (!keyword) {
+      displayProducts(products); // Nếu input trống, hiển thị tất cả
+      return;
+    }
+
+    const matches = products.filter(p =>
+      p.name.toLowerCase().includes(keyword.toLowerCase())
+    );
+
+    displayProducts(matches);
+  }
+
+  // Khi trang load xong, hiển thị tất cả sản phẩm
+  window.onload = () => {
+    displayProducts(products);
+  };
 </script>
+
+    
 
 </body>
 </html>
