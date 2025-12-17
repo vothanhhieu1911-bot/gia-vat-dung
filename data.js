@@ -73,9 +73,15 @@ const products = [
       name: "tu",
       price: 0,
       image: "images/tubede.jpg"
+    },
+    {
+      name: "tap ngao",
+      price: 0,
+      image: "images/tap.jpg"
     }
   ];
   
+
 
 
 
