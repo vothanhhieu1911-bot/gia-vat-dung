@@ -1,107 +1,322 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta charset="UTF-8">
-  <title>Tra cứu giá sản phẩm</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quyền Anh Sport Shop</title>
 
-  <!-- Load dữ liệu -->
-  <script src="data.js"></script>
-
-  <style>
-  body {
-    font-family: Arial;
-    padding: 30px;
-  }
-  input {
-    width: 300px;
-    padding: 8px;
-    font-size: 16px;
-  }
-
-  /* Container chứa các card */
-  #result {
-    display: grid; /* bật layout grid */
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* mỗi cột tối thiểu 250px */
-    gap: 20px; /* khoảng cách giữa các card */
-  }
-
-  /* Card sản phẩm */
-  .card {
-    border: 1px solid #ccc;
-    padding: 15px;
-    background: #fff;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    border-radius: 8px;
-    text-align: center;
-  }
-
-  /* Ảnh trong card */
-  .card img {
-    width: 100%;
-    height: 150px;
-    object-fit: contain; /* giữ tỉ lệ ảnh */
-    margin-top: 10px;
-  }
+<style>
+  body { font-family: Arial; padding: 20px; background-color: #f8f8f8; }
+  header { text-align:center; margin-bottom:20px; }
+  header h1 { color:#ff4500; font-family: 'Arial Black', sans-serif; }
+  input[type="text"] { width:100%; max-width:400px; padding:10px; font-size:16px; border:2px solid #ff4500; border-radius:8px; margin-bottom:20px; }
+  #result { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:20px; }
+  .card { border:1px solid #ddd; padding:15px; background:#fff; box-shadow:0 3px 6px rgba(0,0,0,0.1); border-radius:10px; text-align:center; transition:transform 0.2s, border 0.2s; }
+  .card:hover { transform:translateY(-5px); box-shadow:0 5px 10px rgba(0,0,0,0.2); }
+  .card.selected { border:2px solid red; }
+  .card img { width:100%; height:150px; object-fit:contain; margin-top:10px; }
+  .card input[type="checkbox"] { margin-right:5px; }
+  table { width:100%; border-collapse:collapse; margin-top:10px; }
+  table th, table td { padding:10px; text-align:center; }
+  table th { background-color:#ff4500; color:#fff; }
+  table, th, td { border:1px solid #ddd; }
+  #cart, #orderResult { margin-top:30px; display:none; }
+  #cart input[type="number"] { width:60px; padding:5px; border-radius:5px; border:1px solid #ccc; }
+  button { margin-top:10px; padding:10px 20px; background:#ff4500; color:#fff; border:none; border-radius:5px; cursor:pointer; font-size:16px; }
+  button:hover { background:#e03e00; }
+  /* Popup xác nhận */
+  .popup { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center; }
+  .popup .popup-content { background:#fff; padding:20px; border-radius:10px; max-width:400px; width:90%; text-align:center; }
+  .popup .popup-content h2 { margin-bottom:10px; }
+  .popup .popup-content button { margin:10px 5px; }
+  .popup input { width:80%; padding:8px; margin:5px 0; font-size:14px; border:1px solid #ccc; border-radius:5px; }
 </style>
-
 </head>
 <body>
 
-<h2>🔍 Tra cứu giá sản phẩm</h2>
+<header>
+  <img src="images/logo.png" alt="Quyền Anh Shop" style="height:80px;">
+  <h1>Quyền Anh Sport Shop</h1>
+  <p>Chuyên đồ thể thao chất lượng cao</p>
+  <img src="images/banner.jpg" alt="Banner" style="width:100%; max-height:200px; object-fit:cover; border-radius:10px;">
+</header>
 
-<input
-  type="text"
-  placeholder="Nhập tên sản phẩm..."
-  onkeyup="searchProduct(this.value)"
->
+<h2>🔍 Tra cứu giá sản phẩm</h2>
+<input type="text" placeholder="Nhập tên sản phẩm..." onkeyup="searchProduct(this.value)">
 
 <div id="result"></div>
 
+<div id="cart">
+  <h3>Giỏ hàng</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Sản phẩm</th>
+        <th>Giá</th>
+        <th>Số lượng</th>
+        <th>Thành tiền</th>
+      </tr>
+    </thead>
+    <tbody id="cartBody"></tbody>
+    <tfoot>
+      <tr>
+        <td colspan="3" style="text-align:right;"><b>Tổng tiền:</b></td>
+        <td id="cartTotal">0 đ</td>
+      </tr>
+      <tr>
+        <td colspan="3" style="text-align:right;"><b>Thuế (5%):</b></td>
+        <td id="cartTax">0 đ</td>
+      </tr>
+      <tr>
+        <td colspan="3" style="text-align:right;"><b>Thanh toán:</b></td>
+        <td id="cartFinal">0 đ</td>
+      </tr>
+    </tfoot>
+  </table>
+  <button onclick="placeOrder()">Đặt hàng</button>
+</div>
+
+<div id="orderResult">
+  <h3>Đơn hàng của bạn</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Sản phẩm</th>
+        <th>Giá</th>
+        <th>Số lượng</th>
+        <th>Thành tiền</th>
+      </tr>
+    </thead>
+    <tbody id="orderBody"></tbody>
+  </table>
+</div>
+
+<!-- Popup xác nhận đặt hàng -->
+<div id="confirmPopup" class="popup">
+  <div class="popup-content">
+    <h2>Quyền Anh Sport Shop</h2>
+    <p>Bạn có chắc chắn muốn đặt hàng không?</p>
+    <button onclick="closePopup()">Không</button>
+    <button onclick="showCustomerInfoPopup()">Có</button>
+  </div>
+</div>
+
+<!-- Popup nhập thông tin khách hàng -->
+<div id="customerInfoPopup" class="popup">
+  <div class="popup-content">
+    <h2>Quyền Anh Sport Shop</h2>
+    <p>Quý khách vui lòng nhập địa chỉ và số điện thoại để xác nhận đơn hàng</p>
+    <input type="text" id="customerAddress" placeholder="Địa chỉ"><br>
+    <input type="text" id="customerPhone" placeholder="Số điện thoại"><br>
+    <button onclick="confirmCustomerInfo()">Xác nhận</button>
+    <button onclick="closeCustomerInfoPopup()">Hủy</button>
+  </div>
+</div>
+
+<script src="data.js"></script>
 <script>
-  // Hàm viết hoa chữ cái đầu
-  function capitalizeWords(str) {
-    return str.replace(/\b\w/g, c => c.toUpperCase());
-  }
+const selectedProducts = {};
+let orderCount = 0;
 
-  // Hàm hiển thị sản phẩm
-  function displayProducts(productsToShow) {
-    const result = document.getElementById("result");
+// Telegram
+const telegramBotToken = "8273857573:AAEYcSW6HxSq_IJ8oNJfKrq6tVxhVUA3Y8U";
+const telegramChatId = "6403555640";
 
-    if (productsToShow.length > 0) {
-      result.innerHTML = productsToShow.map(p => `
-        <div class="card">
-          <b>${capitalizeWords(p.name)}</b>
-          <div class="price">${p.price > 0 ? p.price.toLocaleString() + ' đ' : 'Liên hệ để biết giá'}</div>
-          <img src="${p.image}" alt="${p.name}">
-        </div>
-      `).join("");
-    } else {
-      result.innerHTML = "❌ Không tìm thấy sản phẩm";
+function capitalizeWords(str) {
+  return str.replace(/\b\w/g, c => c.toUpperCase());
+}
+
+// Hiển thị sản phẩm
+function displayProducts(productsToShow) {
+  const result = document.getElementById("result");
+  result.innerHTML = productsToShow.map(p => {
+    const index = products.indexOf(p);
+    return `
+      <div class="card ${selectedProducts[index] ? 'selected' : ''}">
+        <b>${capitalizeWords(p.name)}</b>
+        <div class="price">${p.price>0 ? p.price.toLocaleString() + ' đ' : 'Liên hệ để biết giá'}</div>
+        <img src="${p.image}" alt="${p.name}">
+        ${p.price>0 ? `<div style="margin-top:10px;">
+          <input type="checkbox" id="select-${index}" onchange="updateCart(${index})" ${selectedProducts[index] ? 'checked' : ''}> Chọn sản phẩm
+        </div>` : ''}
+      </div>
+    `;
+  }).join("");
+}
+
+// Cập nhật giỏ hàng
+function updateCart(index) {
+  const checkbox = document.getElementById(`select-${index}`);
+  const cart = document.getElementById('cart');
+  const cartBody = document.getElementById('cartBody');
+  const card = checkbox.closest('.card');
+  const p = products[index];
+
+  if(checkbox.checked){
+    selectedProducts[index] = true;
+    card.classList.add('selected');
+    if(!document.getElementById(`cartRow-${index}`)){
+      const row = document.createElement('tr');
+      row.id = `cartRow-${index}`;
+      row.innerHTML = `
+        <td>${capitalizeWords(p.name)}</td>
+        <td>${p.price.toLocaleString()} đ</td>
+        <td><input type="number" min="1" value="1" id="cartQty-${index}" onchange="updateCartTotal()"></td>
+        <td id="cartItemTotal-${index}">${p.price.toLocaleString()} đ</td>
+      `;
+      cartBody.appendChild(row);
     }
+  } else {
+    delete selectedProducts[index];
+    card.classList.remove('selected');
+    const row = document.getElementById(`cartRow-${index}`);
+    if(row) row.remove();
   }
+  cart.style.display = cartBody.children.length > 0 ? 'block' : 'none';
+  updateCartTotal();
+}
 
-  // Hàm search khi người dùng gõ
-  function searchProduct(keyword) {
-    if (!keyword) {
-      displayProducts(products); // Nếu input trống, hiển thị tất cả
-      return;
+// Tính tổng tiền và thuế 5%
+function updateCartTotal() {
+  let total = 0;
+  products.forEach((p,index)=>{
+    const qtyInput = document.getElementById(`cartQty-${index}`);
+    const itemTotalCell = document.getElementById(`cartItemTotal-${index}`);
+    if(qtyInput && itemTotalCell){
+      const qty = parseInt(qtyInput.value)||0;
+      const itemTotal = p.price*qty;
+      itemTotalCell.innerText = itemTotal.toLocaleString() + ' đ';
+      total += itemTotal;
     }
+  });
+  const tax = total*0.05;
+  const final = total + tax;
+  document.getElementById('cartTotal').innerText = total.toLocaleString()+' đ';
+  document.getElementById('cartTax').innerText = tax.toLocaleString()+' đ';
+  document.getElementById('cartFinal').innerText = final.toLocaleString()+' đ';
+}
 
-    const matches = products.filter(p =>
-      p.name.toLowerCase().includes(keyword.toLowerCase())
-    );
+// Nút đặt hàng
+function placeOrder() {
+  if(Object.keys(selectedProducts).length===0){
+    alert("Bạn chưa chọn sản phẩm nào!");
+    return;
+  }
+  document.getElementById('confirmPopup').style.display='flex';
+}
 
-    displayProducts(matches);
+function closePopup() { document.getElementById('confirmPopup').style.display='none'; }
+
+function showCustomerInfoPopup() {
+  closePopup();
+  document.getElementById('customerInfoPopup').style.display='flex';
+}
+
+function closeCustomerInfoPopup() { document.getElementById('customerInfoPopup').style.display='none'; }
+
+// Gửi đơn hàng qua Telegram
+function sendOrderToTelegram(address, phone) {
+  let message = `💌 Đơn hàng từ Quyền Anh Sport Shop\n\nKhách hàng: ${address}\nSĐT: ${phone}\n\nChi tiết đơn hàng:\n`;
+  let total = 0;
+  for (let index in selectedProducts) {
+    const p = products[index];
+    const qty = parseInt(document.getElementById(`cartQty-${index}`).value)||0;
+    const itemTotal = p.price*qty;
+    total += itemTotal;
+    message += `${capitalizeWords(p.name)} - ${p.price.toLocaleString()} đ x ${qty} = ${itemTotal.toLocaleString()} đ\n`;
+  }
+  const tax = total*0.05;
+  const final = total + tax;
+  message += `\nThuế 5%: ${tax.toLocaleString()} đ\nTổng thanh toán: ${final.toLocaleString()} đ`;
+
+  fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage?chat_id=${telegramChatId}&text=${encodeURIComponent(message)}`)
+    .then(res=>console.log("Gửi Telegram thành công!"))
+    .catch(err=>console.error("Gửi Telegram thất bại", err));
+}
+
+// Xác nhận thông tin khách hàng
+function confirmCustomerInfo() {
+  const address = document.getElementById('customerAddress').value.trim();
+  const phone = document.getElementById('customerPhone').value.trim();
+  if(!address || !phone){
+    alert("Vui lòng nhập đầy đủ địa chỉ và số điện thoại!");
+    return;
   }
 
-  // Khi trang load xong, hiển thị tất cả sản phẩm
-  window.onload = () => {
+  const orderBody = document.getElementById('orderBody');
+  orderCount++;
+  
+  // Khoảng cách / màu vàng nhạt
+  const separator = document.createElement('div');
+  separator.style.backgroundColor = '#fff8dc';
+  separator.style.padding = '10px';
+  separator.style.marginTop = '20px';
+  separator.innerHTML = `<b>Đơn hàng số ${orderCount} - Khách hàng: ${address}, ${phone}</b>`;
+  orderBody.appendChild(separator);
+
+  let total=0;
+  for(let index in selectedProducts){
+    const p = products[index];
+    const qty = parseInt(document.getElementById(`cartQty-${index}`).value)||0;
+    const itemTotal = p.price*qty;
+    total += itemTotal;
+
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${capitalizeWords(p.name)}</td>
+      <td>${p.price.toLocaleString()} đ</td>
+      <td>${qty}</td>
+      <td>${itemTotal.toLocaleString()} đ</td>
+    `;
+    orderBody.appendChild(row);
+  }
+
+  const tax = total*0.05;
+  const final = total + tax;
+
+  const totalRow = document.createElement('tr');
+  totalRow.style.fontWeight='bold';
+  totalRow.innerHTML = `
+    <td colspan="3" style="text-align:right;">Tổng đơn hàng (có thuế 5%):</td>
+    <td>${final.toLocaleString()} đ</td>
+  `;
+  orderBody.appendChild(totalRow);
+
+  document.getElementById('orderResult').style.display='block';
+  document.getElementById('orderResult').scrollIntoView({behavior:'smooth'});
+
+  // Gửi Telegram
+  sendOrderToTelegram(address, phone);
+
+  // Reset giỏ hàng
+  for(let index in selectedProducts){
+    document.getElementById(`select-${index}`).checked = false;
+    const row = document.getElementById(`cartRow-${index}`);
+    if(row) row.remove();
+    const card = document.querySelectorAll('.card')[index];
+    if(card) card.classList.remove('selected');
+  }
+  for(let key in selectedProducts) delete selectedProducts[key];
+  document.getElementById('cart').style.display='none';
+  closeCustomerInfoPopup();
+
+  document.getElementById('customerAddress').value = '';
+  document.getElementById('customerPhone').value = '';
+}
+
+// Tìm kiếm sản phẩm
+function searchProduct(keyword){
+  if(!keyword){
     displayProducts(products);
-  };
-</script>
+    return;
+  }
+  const matches = products.filter(p => p.name.toLowerCase().includes(keyword.toLowerCase()));
+  displayProducts(matches);
+}
 
-    
+// Load trang
+window.onload = ()=>{ displayProducts(products); };
+</script>
 
 </body>
 </html>
