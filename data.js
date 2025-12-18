@@ -11,12 +11,12 @@ const products = [
     },
     {
       name: "cong ngu",
-      price: 0,
+      price: 1000,
       image: "images/congngu.jpg"
     },
     {
       name: "nghia",
-      price: 0,
+      price: 1000,
       image: "images/nghia.jpg"
     },
     {
@@ -47,40 +47,12 @@ const products = [
     {
       name: "nghia3",
       price: 20000,
-      image: "images/nghia.jpg"
-    },
-    {
-      name: "cong ngu4",
-      price: 100000,
-      image: "images/congngu.jpg"
-    },
-    {
-      name: "nghia4",
-      price: 100000,
-      image: "images/nghia.jpg"
-    },
-    {
-      name: "cong ngu5",
-      price: 1000000,
-      image: "images/congngu.jpg"
-    },
-    {
-      name: "nghia5",
-      price: 1000000,
-      image: "images/nghia.jpg"
-    },
-    {
-      name: "tu",
-      price: 0,
-      image: "images/tubede.jpg"
-    },
-    {
-      name: "tap ngao",
-      price: 0,
+    2000:,
       image: "images/tap.jpg"
     }
   ];
   
+
 
 
 
