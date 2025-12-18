@@ -1,12 +1,12 @@
 const products = [
     {
-      name: "cau long vinavina",
-      price: 1800000,
+      name: "cau long vina",
+      price: 18000,
       image: "images/caulongvina.jpg"
     },
     {
       name: "cau long hai yen",
-      price: 2500000,
+      price: 25000,
       image: "images/caulonghaiyen.jpg"
     },
     {
@@ -47,14 +47,27 @@ const products = [
     {
       name: "nghia3",
       price: 20000,
-    2000:,
-      image: "images/tap.jpg"
+      image: "images/nghia.jpg"
+    },
+    {
+      name: "cong ngu4",
+      price: 100000,
+      image: "images/congngu.jpg"
+    },
+    {
+      name: "nghia4",
+      price: 100000,
+      image: "images/nghia.jpg"
+    },
+    {
+      name: "cong ngu5",
+      price: 1000000,
+      image: "images/congngu.jpg"
+    },
+    {
+      name: "nghia5",
+      price: 1000000,
+      image: "images/nghia.jpg"
     }
   ];
   
-
-
-
-
-
-
